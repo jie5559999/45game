@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>NK的大便大冒险</h1>
+  
+  <!-- 游戏窗口 -->
+  <canvas id="gameCanvas" width="800" height="300"></canvas>
+  
+  <!-- 加载Pyodide -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+  
+  <script>
+    // 游戏启动函数
+    async function startGame() {
+      // 显示加载提示
+      document.body.innerHTML += "<p>游戏加载中，请稍候...</p >";
+      
+      // 初始化Pyodide
+      let pyodide = await loadPyodide();
+      await pyodide.loadPackage("pygame");
+      
+      // 获取游戏代码
+      const response = await fetch("game.py");
+      const gameCode = await response.text();
+      
+      // 创建虚拟文件系统
+      pyodide.FS.writeFile("NK.png", await (await fetch("NK.png")).arrayBuffer());
+      pyodide.FS.writeFile("dabian.png", await (await fetch("dabian.png")).arrayBuffer());
+      
+      // 运行游戏
+      pyodide.runPython(gameCode);
+      
+      // 移除加载提示
+      document.querySelector("p").remove();
+    }
+    
+    // 页面加载完成后启动游戏
+    window.addEventListener("load", startGame);
+  </script>
+  
+  <!-- 操作说明 -->
+  <div style="margin-top:20px">
+    <h3>操作说明：</h3>
+    <p>空格键/↑键：跳跃</p >
+    <p>↓键：下蹲</p >
+  </div>
+</body>
+</html>
